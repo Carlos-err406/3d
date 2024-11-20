@@ -4,6 +4,7 @@ import moderngl
 
 # from models.triangle import Triangle
 from models.square import Square
+from models.text import Text
 
 
 class GraphicsEngine:
@@ -21,8 +22,23 @@ class GraphicsEngine:
             pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.OPENGL | pygame.RESIZABLE,
         )
         self.ctx = moderngl.create_context()
+
+        # enable alpha channel for colors
+        self.ctx.enable(moderngl.BLEND)
+        self.ctx.blend_func = (moderngl.SRC_ALPHA, moderngl.ONE_MINUS_SRC_ALPHA)
+
         self.clock = pygame.time.Clock()
-        self.scene = Square(self)
+
+        square = Square(self, rotation=45, color=(1, 1, 1, 0.8))
+        text = Text(
+            self,
+            "OMEN",
+            position=(0, -0.4),
+            font_size=120,
+            font_path="fonts/hewlett-packard.otf",
+        )
+        self.text = text
+        self.scene = square
 
     def check_events(self):
         def _is_quitting(event):
@@ -39,13 +55,18 @@ class GraphicsEngine:
     def render(self):
         self.ctx.clear(color=(0, 0, 0.1))
         self.scene.render()
+        self.text.render()
         pygame.display.flip()
 
     def run(self):
         while True:
             self.check_events()
+
+            # self.scene.rotation = self.scene.rotation - 0.1
+            # self.scene.rotate(self.scene.rotation - 0.1)
+
             self.render()
-            self.clock.tick(140)
+            self.clock.tick(60)
 
 
 if __name__ == "__main__":
